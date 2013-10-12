@@ -1,0 +1,35 @@
+<h1>Listing tasks</h1>
+
+<%= link_to 'TOPへ', top_pages_path %>
+
+<%= form_for(@task, html: {data: {bind: 'submit: addTask'}}, remote: true) do |f| %>
+  <%= f.label :name %>
+  <%= f.text_field :name, data: {bind: 'value: name'} %>
+  <%= f.submit %>
+<% end %>
+
+<ul data-bind='foreach: taskList'>
+  <li data-bind='text: name'></li>
+</ul>
+
+<script>
+  $(function(){
+    function ViewModel() {
+      //taskListに配列データをバインディングする。初期値は、DBから取得した全タスク
+      this.taskList = ko.observableArray(<%= raw @tasks.to_json %>);
+      this.name = ko.observable('');
+
+      //フォームがサブミットされた時に発火する関数
+      this.addTask = function () {
+        var task = {
+          name: this.name()
+        };
+        this.taskList.push(task);
+        this.name('');
+      };
+    }
+
+    ko.applyBindings(new ViewModel());
+  })
+</script>
+
